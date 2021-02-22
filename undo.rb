@@ -1,13 +1,30 @@
 # Flipping my ZK back to Obsidian's Format
 
-SRC = "~/Dropbox/wiki"
-DST = "./wiki"
+SRC = "#{Dir.home}/Dropbox/wiki"
+DST = './wiki'
 
 # delete the distribution folder
-Dir.rmdir(DST)
+Dir.rmdir(DST) if Dir.exist?(DST)
 
 # make the folder
-Dir.new(DST)
+Dir.mkdir(DST)
+
+class Zettel
+  attr_reader :content
+
+  def initialize(file)
+    @content = File.read(file)
+  end
+
+  def title
+    /^title: "?(.*)"?/.match(@content).captures.first
+  end
+end
+
+Dir.glob("#{SRC}/*.md").each do |file|
+  zettel = Zettel.new(file)
+  puts zettel.title
+end
 
 # - make a map of filename transitions
 #     - Use the `title:` attribute for the filename
