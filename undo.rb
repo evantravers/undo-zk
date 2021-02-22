@@ -22,18 +22,6 @@ class Zettel
   end
 end
 
-Dir.glob("#{SRC}/*.md").each do |file|
-  zettel = Zettel.new(file)
-  puts zettel.title
-end
-
-# - make a map of filename transitions
-#     - Use the `title:` attribute for the filename
-#     - Rules
-#         - `tag:#journal` -> Daily note in `/journal`
-#         - `tag:#career` -> Folders `/careers/eab/` etc.
-#         - `tag:#booknotes` -> Folder: `/booknotes`
-#         - Should I abstract the Folder -> Tag, Tag -> Folder concept?
 #     - Error any duplicate final filenames
 # - Change Links
 #     - For each starting, filename, search through the ZK to find matching
@@ -42,3 +30,20 @@ end
 # - Execute
 #     - Have a dry-run option
 #     - Logging
+filenames = {}
+
+# - make a map of filename transitions
+#     - Use the `title:` attribute for the filename
+#     - Rules
+#         - `tag:#journal` -> Daily note in `/journal`
+#         - `tag:#career` -> Folders `/careers/eab/` etc.
+#         - `tag:#booknotes` -> Folder: `/booknotes`
+Dir.glob("#{SRC}/*.md").each do |file|
+  zettel = Zettel.new(file)
+  if filenames.values.include?(zettel.title)
+    puts "🛑 duplicate name: #{file}"
+  else
+    filenames[file] = zettel.title
+  end
+end
+
