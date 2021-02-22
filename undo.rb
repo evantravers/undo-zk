@@ -35,7 +35,8 @@ end
 #         - Should I abstract the Folder -> Tag, Tag -> Folder concept?
 #     - Error any duplicate final filenames
 # - Change Links
-#     - For each starting, filename, search through the ZK to find matching links, replacing with the final filename.
+#     - For each starting, filename, search through the ZK to find matching
+#       links, replacing with the final filename.
 #     - Leave block references and header references alone.
 # - Execute
 #     - Have a dry-run option
