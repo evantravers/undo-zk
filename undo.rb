@@ -2,6 +2,7 @@
 
 SRC = "#{Dir.home}/Dropbox/wiki"
 DST = './wiki'
+FORBIDDEN = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
 
 # delete the distribution folder
 Dir.rmdir(DST) if Dir.exist?(DST)
