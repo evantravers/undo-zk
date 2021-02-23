@@ -29,7 +29,6 @@ class Zettel
 
   def tags
     match = /^tags: ?\[(.*)\]$/.match(@content)
-
     if match
       match
       .captures
@@ -41,6 +40,7 @@ class Zettel
     end
   end
 
+  # these rules apply "last wins"
   def folders
     if tags
       case
@@ -48,6 +48,13 @@ class Zettel
         ['booknotes']
       when tags.include?('#links')
         ['links']
+      when tags.any? { |t| t.match /#career\// }
+        tags
+          .find { |t| t.match /#career\// }
+          .gsub('#', '')
+          .split('/')
+      when tags.include?('#journal')
+        ['journal']
       else
         ""
       end
@@ -74,9 +81,9 @@ end
 
 def fix_links(content, filenames)
   filenames.reduce(content) do |new_content, mapping|
-    old, new = mapping
+    old, zettel = mapping
 
-    new_content.gsub(old, new)
+    new_content.gsub(old, File.join(zettel.folders, zettel.filename))
   end
 end
 
@@ -91,7 +98,7 @@ Dir.glob("#{SRC}/*.md").each do |file|
   zettel = Zettel.new(file)
   err("🛑 duplicate name: #{file}") if filenames.values.include?(zettel.title)
 
-  filenames[File.basename(file, ".*")] = zettel.filename 
+  filenames[File.basename(file, ".*")] = zettel
 end
 
 # make files based on the new filenames, but fixing the links in the content
