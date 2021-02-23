@@ -1,5 +1,7 @@
 # Flipping my ZK back to Obsidian's Format
 
+require 'pry'
+
 SRC = "#{Dir.home}/Dropbox/wiki"
 DST = './wiki'
 FORBIDDEN = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
@@ -44,6 +46,11 @@ end
 #     - Logging
 filenames = {}
 
+def err(str)
+  puts str
+  binding.pry
+end
+
 # - make a map of filename transitions
 #     - Use the `title:` attribute for the filename
 #     - Rules
@@ -52,7 +59,8 @@ filenames = {}
 #         - `tag:#booknotes` -> Folder: `/booknotes`
 Dir.glob("#{SRC}/*.md").each do |file|
   zettel = Zettel.new(file)
-  puts "🛑 duplicate name: #{file}" if filenames.values.include?(zettel.title)
+  err("🛑 duplicate name: #{file}") if filenames.values.include?(zettel.title)
+
 
   filenames[file] = zettel.title
 end
