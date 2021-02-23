@@ -72,7 +72,7 @@ class Zettel
   def title
     return @meta['title'].to_s.gsub(FORBIDDEN, "") if @meta['title']
 
-    @original_filename
+    File.basename(@original_filename)
   end
 end
 
