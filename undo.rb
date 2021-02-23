@@ -56,15 +56,23 @@ class Zettel
       when tags.include?('#journal')
         ['journal']
       else
-        ""
+        nil
       end
     else
-      ""
+      nil
     end
   end
 
   def filename
     title
+  end
+
+  def path
+    if folders
+      File.join(folders, filename)
+    else
+      filename
+    end
   end
 
   def title
@@ -83,12 +91,13 @@ def fix_links(content, filenames)
   filenames.reduce(content) do |new_content, mapping|
     old, zettel = mapping
 
-    new_content.gsub(old, File.join(zettel.folders, zettel.filename))
+    new_content.gsub(old, zettel.path)
   end
 end
 
 # delete the distribution folder
 `rm -rf #{DST}`
+`mkdir #{DST}`
 
 # ---
 
@@ -106,10 +115,10 @@ Dir.glob("#{SRC}/*.md").each do |file|
   zettel = Zettel.new(file)
 
   # create any folders
-  `mkdir -p #{File.join(DST, zettel.folders)}`
+  `mkdir -p #{File.join(DST, zettel.folders)}` if zettel.folders
 
   File.write(
-    File.join([DST, zettel.folders, "#{zettel.filename}.md"]),
+    "#{File.join([DST, zettel.path])}.md",
     fix_links(zettel.content, filenames)
   )
 end
