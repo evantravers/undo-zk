@@ -6,12 +6,6 @@ SRC = "#{Dir.home}/Dropbox/wiki"
 DST = './wiki'
 FORBIDDEN = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
 
-# delete the distribution folder
-Dir.rmdir(DST) if Dir.exist?(DST)
-
-# make the folder
-Dir.mkdir(DST)
-
 class Zettel
   attr_reader :content
 
@@ -32,7 +26,7 @@ class Zettel
   end
 
   def title
-    /^title: "?(.*)"?/.match(@content).captures.first
+    /^title: "?(.*)"?$/.match(@content).captures.first
   end
 end
 
@@ -51,6 +45,9 @@ def err(str)
   binding.pry
 end
 
+# delete the distribution folder
+Dir.each_child(DST) { |f| File.delete(File.join(DST, f)) }
+
 # - make a map of filename transitions
 #     - Use the `title:` attribute for the filename
 #     - Rules
@@ -61,7 +58,9 @@ Dir.glob("#{SRC}/*.md").each do |file|
   zettel = Zettel.new(file)
   err("🛑 duplicate name: #{file}") if filenames.values.include?(zettel.title)
 
+  filename = "#{zettel.title}.md"
+  content = zettel.content
 
-  filenames[file] = zettel.title
+  File.write("#{DST}/#{filename}", content)
 end
 
