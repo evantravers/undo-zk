@@ -17,6 +17,18 @@ class Zettel
     @content = File.read(file)
   end
 
+  def tags
+    match = /^tags: ?\[(.*)\]$/.match(@content)
+      if match
+        match
+        .captures
+        .first
+        .split(/, ?/)
+      else
+        return nil
+      end
+  end
+
   def title
     /^title: "?(.*)"?/.match(@content).captures.first
   end
@@ -40,10 +52,8 @@ filenames = {}
 #         - `tag:#booknotes` -> Folder: `/booknotes`
 Dir.glob("#{SRC}/*.md").each do |file|
   zettel = Zettel.new(file)
-  if filenames.values.include?(zettel.title)
-    puts "🛑 duplicate name: #{file}"
-  else
-    filenames[file] = zettel.title
-  end
+  puts "🛑 duplicate name: #{file}" if filenames.values.include?(zettel.title)
+
+  filenames[file] = zettel.title
 end
 
