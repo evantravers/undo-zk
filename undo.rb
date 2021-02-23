@@ -23,29 +23,30 @@ DST = './wiki'
 FORBIDDEN = /[<>:"\/\\|?*]/
 
 class Zettel
-  attr_reader :content, :meta
+  attr_reader :content, :meta, :original_filename
 
   def initialize(file)
-    @content = File.read(file)
-    @meta = YAML.load(@content)
+    @original_filename = file
+    @content           = File.read(file)
+    @meta              = YAML.load(@content)
   end
 
   def tags
     @meta['tags']
   end
 
-  # these rules apply "last wins"
+  # these rules apply "first wins"
   def folders
     if tags
       return ['booknotes'] if tags.include?('#booknote')
       return ['links'] if tags.include?('#links')
+      return ['journal'] if tags.include?('#journal')
       if tags.any? { |t| t.match /#career\// }
         return tags
                 .find { |t| t.match /#career\// }
                 .gsub('#', '')
                 .split('/')
       end
-      return ['journal'] if tags.include?('#journal')
     end
 
     nil
@@ -69,7 +70,9 @@ class Zettel
   end
 
   def title
-    @meta['title'].to_s.gsub(FORBIDDEN, "")
+    return @meta['title'].to_s.gsub(FORBIDDEN, "") if @meta['title']
+
+    @original_filename
   end
 end
 
