@@ -25,7 +25,6 @@ class Zettel
   attr_reader :content, :meta
 
   def initialize(file)
-    puts file
     @content = File.read(file)
     @meta = YAML.load(@content)
   end
