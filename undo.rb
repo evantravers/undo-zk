@@ -16,6 +16,7 @@
 
 require 'pry'
 require 'yaml'
+require 'uri'
 
 SRC = "#{Dir.home}/Dropbox/wiki"
 DST = './wiki'
@@ -36,27 +37,26 @@ class Zettel
   # these rules apply "last wins"
   def folders
     if tags
-      case
-      when tags.include?('#booknote')
-        ['booknotes']
-      when tags.include?('#links')
-        ['links']
-      when tags.any? { |t| t.match /#career\// }
-        tags
-          .find { |t| t.match /#career\// }
-          .gsub('#', '')
-          .split('/')
-      when tags.include?('#journal')
-        ['journal']
-      else
-        nil
+      return ['booknotes'] if tags.include?('#booknote')
+      return ['links'] if tags.include?('#links')
+      if tags.any? { |t| t.match /#career\// }
+        return tags
+                .find { |t| t.match /#career\// }
+                .gsub('#', '')
+                .split('/')
       end
-    else
-      nil
+      return ['journal'] if tags.include?('#journal')
     end
+
+    nil
   end
 
   def filename
+    if tags and tags.include?("#links")
+      match = @content.match(URI.regexp(['http', 'https']))
+      return "#{title.gsub(match[4], "")} - #{match[4]}" if match
+    end
+
     title
   end
 
@@ -69,9 +69,7 @@ class Zettel
   end
 
   def title
-    title = /^title: "?(.*)"?$/.match(@content)
-
-    title.captures.first.gsub(FORBIDDEN, "")
+    @meta['title'].to_s.gsub(FORBIDDEN, "")
   end
 end
 
