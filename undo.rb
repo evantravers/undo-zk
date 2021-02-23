@@ -54,8 +54,13 @@ class Zettel
 
   def filename
     if tags and tags.include?("#links")
-      match = @content.match(URI.regexp(['http', 'https']))
-      return "#{title.gsub(match[4], "")} - #{match[4]}" if match
+      url = URI.parse(URI.extract(@content).last).host
+      return "#{title.gsub(url, "")} - #{url}" if url
+    end
+
+    if tags and tags.include?("#booknote")
+      author = @meta['author'].split(',').first if @meta['author']
+      return "#{title} by #{author}" if author
     end
 
     title
