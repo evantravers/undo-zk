@@ -15,29 +15,23 @@
 #     - Logging
 
 require 'pry'
+require 'yaml'
 
 SRC = "#{Dir.home}/Dropbox/wiki"
 DST = './wiki'
 FORBIDDEN = /[<>:"\/\\|?*]/
 
 class Zettel
-  attr_reader :content
+  attr_reader :content, :meta
 
   def initialize(file)
+    puts file
     @content = File.read(file)
+    @meta = YAML.load(@content)
   end
 
   def tags
-    match = /^tags: ?\[(.*)\]$/.match(@content)
-    if match
-      match
-      .captures
-      .first
-      .split(/, ?/)
-      .map { |t| t.gsub('"', '') }
-    else
-      return nil
-    end
+    @meta['tags']
   end
 
   # these rules apply "last wins"
@@ -111,9 +105,7 @@ Dir.glob("#{SRC}/*.md").each do |file|
 end
 
 # make files based on the new filenames, but fixing the links in the content
-Dir.glob("#{SRC}/*.md").each do |file|
-  zettel = Zettel.new(file)
-
+filenames.values.each do |zettel|
   # create any folders
   `mkdir -p #{File.join(DST, zettel.folders)}` if zettel.folders
 
