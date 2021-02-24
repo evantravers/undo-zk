@@ -17,6 +17,7 @@
 require 'pry'
 require 'yaml'
 require 'uri'
+require 'date'
 
 SRC = "#{Dir.home}/Dropbox/wiki"
 DST = './wiki'
@@ -68,8 +69,23 @@ class Zettel
     title
   end
 
+  def extract_date_from_title(title)
+    if title.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/)
+      return Date.parse(title)
+    end
+    if title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
+      d = title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
+      return Date.parse("#{d['year']}-#{d['month']}-#{d['day']}")
+    end
+  end
+
+  # FIXME: The date on the journal entries is _often_ wrong... I need to
+  # prioritize the date in the body over the one in the metadata
+  #
+  # Scratch that... every single date is wrong?!
   def date
-    return Date.parse(@meta['date']) if @meta['date']
+    return Date.parse(@meta['date']) if (@meta['date'] and !@meta['date'].match(/Thu, 18 Jun 2020/))
+    return extract_date_from_title(@meta['title']) if @meta['title'].match(/\d+-\d+-\d+/)
     return Date.parse(@meta['id'].to_s) if @meta['id']
 
     err("Can't find a date!")
@@ -90,13 +106,13 @@ class Zettel
   end
 end
 
-def err(str)
+def err(str, context = nil)
   puts str
   binding.pry
 end
 
-def fix_links(content, filenames)
-  filenames.reduce(content) do |new_content, mapping|
+def fix_links(content, zettels)
+  zettels.reduce(content) do |new_content, mapping|
     old, zettel = mapping
 
     new_content.gsub(old, zettel.path)
@@ -109,23 +125,23 @@ end
 
 # ---
 
-# filenames becomes a mapping of [old => new] names
-filenames = {}
+# zettels becomes a mapping of [old => new] names
+zettels = {}
 Dir.glob("#{SRC}/*.md").each do |file|
   zettel = Zettel.new(file)
-  err("🛑 duplicate name: #{file}") if filenames.values.include?(zettel.title)
+  # err("🛑 duplicate name: #{file}", [zettels, zettel]) if zettels.values.any? { |z| z.path == zettel.path }
 
-  filenames[File.basename(file, ".*")] = zettel
+  zettels[File.basename(file, ".*")] = zettel
 end
 
-# make files based on the new filenames, but fixing the links in the content
-filenames.values.each do |zettel|
+# make files based on the new zettels, but fixing the links in the content
+zettels.values.each do |zettel|
   # create any folders
   `mkdir -p #{File.join(DST, zettel.folders)}` if zettel.folders
 
   File.write(
     "#{File.join([DST, zettel.path])}.md",
-    fix_links(zettel.content, filenames),
+    fix_links(zettel.content, zettels),
     mode: 'a'
   )
 end
