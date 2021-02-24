@@ -80,7 +80,6 @@ class Zettel
     end
   end
 
-  # FIXME: There's a date (Thu, 18 Jun 2020) that is often applied incorrectly.
   def date
     return Date.parse(@meta['date']) if @meta['date'] && !@meta['date'].match(/Thu, 18 Jun 2020/)
     return extract_date_from_title(@meta['title']) if @meta['title'].match(/\d+-\d+-\d+/)
