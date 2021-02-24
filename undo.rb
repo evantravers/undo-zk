@@ -116,6 +116,7 @@ filenames.values.each do |zettel|
 
   File.write(
     "#{File.join([DST, zettel.path])}.md",
-    fix_links(zettel.content, filenames)
+    fix_links(zettel.content, filenames),
+    mode: 'a'
   )
 end
