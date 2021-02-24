@@ -71,7 +71,6 @@ class Zettel
   def date
     return Date.parse(@meta['date']) if @meta['date']
     return Date.parse(@meta['id'].to_s) if @meta['id']
-    return Date.parse(@original_filename)
 
     err("Can't find a date!")
   end
