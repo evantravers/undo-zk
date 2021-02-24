@@ -19,10 +19,11 @@ require 'yaml'
 require 'uri'
 require 'date'
 
-SRC = "#{Dir.home}/Dropbox/wiki"
-DST = './wiki'
-FORBIDDEN = /[<>:"\/\\|?*]/
+SRC = "#{Dir.home}/Dropbox/wiki".freeze
+DST = './wiki'.freeze
+FORBIDDEN = %r{[<>:"/\|?*]}.freeze
 
+# This represents a Zettel
 class Zettel
   attr_reader :content, :meta, :original_filename
 
@@ -42,11 +43,12 @@ class Zettel
       return ['booknotes'] if tags.include?('#booknote')
       return ['links'] if tags.include?('#links')
       return ['journal'] if tags.include?('#journal')
-      if tags.any? { |t| t.match /#career\// }
+
+      if tags.any? { |t| t.match %r{#career/} }
         return tags
-                .find { |t| t.match /#career\// }
-                .gsub('#', '')
-                .split('/')
+               .find { |t| t.match %r{#career/} }
+               .gsub('#', '')
+               .split('/')
       end
     end
 
@@ -54,34 +56,33 @@ class Zettel
   end
 
   def filename
-    if tags and tags.include?("#links")
+    if tags&.include?('#links')
       url = URI.parse(URI.extract(@content).last).host
-      return "#{title.gsub(url, "")} - #{url}" if url
+      return "#{title.gsub(url, '')} - #{url}" if url
     end
 
-    if tags and tags.include?("#booknote")
+    if tags&.include?('#booknote')
       author = @meta['author'].split(',').first if @meta['author']
       return "#{title} by #{author}" if author
     end
 
-    return date.strftime("%Y-%m-%d") if tags and tags.include?("#journal")
+    return date.strftime('%Y-%m-%d') if tags&.include?('#journal')
 
     title
   end
 
   def extract_date_from_title(title)
-    if title.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/)
-      return Date.parse(title)
-    end
+    return Date.parse(title) if title.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/)
+
     if title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
       d = title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
-      return Date.parse("#{d['year']}-#{d['month']}-#{d['day']}")
+      Date.parse("#{d['year']}-#{d['month']}-#{d['day']}")
     end
   end
 
   # FIXME: There's a date (Thu, 18 Jun 2020) that is often applied incorrectly.
   def date
-    return Date.parse(@meta['date']) if (@meta['date'] and !@meta['date'].match(/Thu, 18 Jun 2020/))
+    return Date.parse(@meta['date']) if @meta['date'] && !@meta['date'].match(/Thu, 18 Jun 2020/)
     return extract_date_from_title(@meta['title']) if @meta['title'].match(/\d+-\d+-\d+/)
     return Date.parse(@meta['id'].to_s) if @meta['id']
 
@@ -97,7 +98,7 @@ class Zettel
   end
 
   def title
-    return @meta['title'].to_s.gsub(FORBIDDEN, "") if @meta['title']
+    return @meta['title'].to_s.gsub(FORBIDDEN, '') if @meta['title']
 
     File.basename(@original_filename)
   end
@@ -128,11 +129,11 @@ Dir.glob("#{SRC}/*.md").each do |file|
   zettel = Zettel.new(file)
   # err("🛑 duplicate name: #{file}", [zettels, zettel]) if zettels.values.any? { |z| z.path == zettel.path }
 
-  zettels[File.basename(file, ".*")] = zettel
+  zettels[File.basename(file, '.*')] = zettel
 end
 
 # make files based on the new zettels, but fixing the links in the content
-zettels.values.each do |zettel|
+zettels.each_value do |zettel|
   # create any folders
   `mkdir -p #{File.join(DST, zettel.folders)}` if zettel.folders
 
