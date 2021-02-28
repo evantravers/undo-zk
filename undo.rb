@@ -74,10 +74,11 @@ class Zettel
   def extract_date_from_title(title)
     return Date.parse(title) if title.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/)
 
-    if title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
-      d = title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
-      Date.parse("#{d['year']}-#{d['month']}-#{d['day']}")
-    end
+    # guard clause
+    return unless title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
+
+    d = title.match(/(?<month>\d{2})-(?<day>\d{2})-(?<year>\d{4})/)
+    Date.parse("#{d['year']}-#{d['month']}-#{d['day']}")
   end
 
   def date
