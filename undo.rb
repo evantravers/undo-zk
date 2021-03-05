@@ -215,11 +215,11 @@ class Zettel
       @content.gsub!(/\b(?<book>#{regex}) (?<chapter>\d{1,3})(?::(?<verse>\d+))?(?:- ?(?<end>\d+))?\b/) do |_v|
         match = Regexp.last_match
         if match[:end]
-          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}##{match[:verse]}]]-#{match[:end]}"
+          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}##{match[:verse]}|#{match}]]"
         elsif match[:verse]
-          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}##{match[:verse]}]]"
+          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}##{match[:verse]}|#{match}]]"
         else
-          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}]]"
+          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}|#{match}]]"
         end
       end
     end
