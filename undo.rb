@@ -189,12 +189,14 @@ class Zettel
   def fix_bible_references
     BOOKS.each do |book_match|
       abbr, regex = book_match
-      @content.gsub!(/\b(?<book>#{regex}) (?<chapter>\d{1,3})(?::(?<verse>\d+))?(?:- ?\d+)?\b/) do |_v|
+      @content.gsub!(/\b(?<book>#{regex}) (?<chapter>\d{1,3})(?::(?<verse>\d+))?(?:- ?(?<end>\d+))?\b/) do |_v|
         match = Regexp.last_match
-        if match[:verse]
-          "[[ESV/#{match[:book]}/#{abbr}-#{match[:chapter]}##{match[:verse]}]]"
+        if match[:end]
+          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}##{match[:verse]}]]-#{match[:end]}"
+        elsif match[:verse]
+          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}##{match[:verse]}]]"
         else
-          "[[ESV/#{match[:book]}/#{abbr}-#{match[:chapter]}]]"
+          "[[ESV/#{abbr}/#{abbr}-#{match[:chapter]}]]"
         end
       end
     end
