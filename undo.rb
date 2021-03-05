@@ -22,6 +22,7 @@ require 'date'
 SRC = "#{Dir.home}/Dropbox/wiki".freeze
 DST = './wiki'.freeze
 FORBIDDEN = %r{[<>:"/\|?*]}.freeze
+# the following books were generated from a list on a bible site, I forget which
 BOOKS = {
   "Genesis"=>/Genesis|Gen\.?|Ge\.?|Gn\.?/,
   "Exodus"=>/Exodus|Ex\.?|Exod\.?|Exo\.?/,
@@ -63,7 +64,9 @@ BOOKS = {
   "Zechariah"=>/Zechariah|Zech\.?|Zec\.?|Zc\.?/,
   "Malachi"=>/Malachi|Mal\.?|Ml\.?/,
   "Matthew"=>/Matthew|Matt\.?|Mt\.?/,
-  "Mark"=>/Mark|Mark|Mrk|Mar|Mk|Mr/,
+  # commenting out "Mar" because it matches March datestamps.
+  # "Mark"=>/Mark|Mark|Mrk|Mar|Mk|Mr/,
+  "Mark"=>/Mark|Mark|Mrk|Mk|Mr/,
   "Luke"=>/Luke|Luke|Luk|Lk/,
   "John"=>/John|John|Joh|Jhn|Jn/,
   "Acts"=>/Acts|Acts|Act|Ac/,
