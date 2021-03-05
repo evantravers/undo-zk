@@ -96,16 +96,30 @@ BOOKS = {
 
 # This represents a Zettel
 class Zettel
-  attr_reader :content, :meta, :original_filename
+  attr_reader :content, :original_filename
 
   def initialize(file)
     @original_filename = file
-    @content           = File.read(file)
-    @meta              = YAML.load(@content)
+
+    file_content       = File.read(file)
+    @meta              = YAML.load(file_content)
+    @content           = remove_meta(file_content)
   end
 
   def tags
     @meta['tags']
+  end
+
+  def meta
+    @meta.to_yaml
+  end
+
+  def remove_meta(str)
+    str.gsub(/---.+?---\n{0,2}/m, '')
+  end
+
+  def render
+    "#{meta}---\n\n#{@content}"
   end
 
   # these rules apply "first wins"
@@ -235,7 +249,7 @@ zettels.each_value do |zettel|
     zettel
       .fix_links(zettels)
       .fix_bible_references
-      .content,
+      .render,
     mode: 'a'
   )
 end
