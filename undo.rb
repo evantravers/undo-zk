@@ -102,19 +102,20 @@ class Zettel
 
     File.basename(@original_filename)
   end
+
+  # zettels should be a map of {:old_filename => NewZettel}
+  def fix_links(zettels)
+    zettels.reduce(@content) do |new_content, mapping|
+      old, zettel = mapping
+
+      new_content.gsub(old, zettel.path)
+    end
+  end
 end
 
 def err(str, context = nil)
   puts str
   binding.pry
-end
-
-def fix_links(content, zettels)
-  zettels.reduce(content) do |new_content, mapping|
-    old, zettel = mapping
-
-    new_content.gsub(old, zettel.path)
-  end
 end
 
 # delete the distribution folder
@@ -139,7 +140,7 @@ zettels.each_value do |zettel|
 
   File.write(
     "#{File.join([DST, zettel.path])}.md",
-    fix_links(zettel.content, zettels),
+    zettel.fix_links(zettels),
     mode: 'a'
   )
 end
