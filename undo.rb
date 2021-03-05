@@ -96,22 +96,31 @@ BOOKS = {
 
 # This represents a Zettel
 class Zettel
-  attr_reader :content, :original_filename
+  attr_reader :content, :meta, :original_filename
 
   def initialize(file)
     @original_filename = file
 
     file_content       = File.read(file)
-    @meta              = YAML.load(file_content)
+    @meta              = load_yaml(file_content)
     @content           = remove_meta(file_content)
+
+    filter_meta
+  end
+
+  def load_yaml(content)
+    return YAML.load(content) if content.match(/---/)
+
+    {}
   end
 
   def tags
     @meta['tags']
   end
 
-  def meta
-    @meta.to_yaml
+  def filter_meta
+    @meta['aliases'] = @meta['aliases'].reject { |a| a == @meta['title'] } if @meta['aliases']
+    @meta.delete_if { |_k, v| v.is_a?(Array) && v.empty? }
   end
 
   def remove_meta(str)
@@ -119,7 +128,7 @@ class Zettel
   end
 
   def render
-    "#{meta}---\n\n#{@content}"
+    "#{@meta.to_yaml}---\n\n#{@content}"
   end
 
   # these rules apply "first wins"
