@@ -74,5 +74,5 @@ def book_number(book)
 end
 
 def book_folder(book)
-  "#{book_number(book)} - #{book}"
+  book
 end

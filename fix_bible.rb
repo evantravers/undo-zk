@@ -40,3 +40,7 @@ Dir.glob("#{BIBLE_SRC}/*/*.md").each do |chapter|
 
   File.write("#{BIBLE_DST}/#{folder}/#{filename}", content)
 end
+
+book_order = BOOKS.keys.map { |b| "- [[#{b}]]" }.join("\n")
+
+File.write("#{BIBLE_DST}/The Bible.md", "# The Bible\n\n#{book_order}")
