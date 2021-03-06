@@ -1,18 +1,17 @@
 require './bible_books'
 
-SRC = './ESV'.freeze
-DST = './wiki/ESV'.freeze
+BIBLE_SRC = './ESV'.freeze
+BIBLE_DST = './wiki/ESV'.freeze
 
-`rm -rf #{DST}`
+`rm -rf #{BIBLE_DST}`
 
 def chapter_number(str)
   str.scan(/-(\d+)/).flatten.first
 end
 
-Dir.glob("#{SRC}/*/*.md").each do |chapter|
-  book       = File.dirname(chapter).gsub("#{SRC}/", '')
-  folder_num = book_number(book)
-  folder     = "#{folder_num} - #{book}"
+Dir.glob("#{BIBLE_SRC}/*/*.md").each do |chapter|
+  book       = File.dirname(chapter).gsub("#{BIBLE_SRC}/", '')
+  folder     = book_folder(book)
   filename   = File.basename(chapter)
   content    = File.read(chapter)
   number     = chapter_number(chapter)
@@ -29,7 +28,7 @@ Dir.glob("#{SRC}/*/*.md").each do |chapter|
     # find all the chapters
     chapters =
       Dir
-      .glob("#{SRC}/#{book}/*.md")
+      .glob("#{BIBLE_SRC}/#{book}/*.md")
       .filter { |c| c.match(/-\d+/) }
       .sort_by { |c| chapter_number(c).to_i }
       .map { |c| "- [[#{File.basename(c)}|#{chapter_number(c)}]]" }
@@ -37,7 +36,7 @@ Dir.glob("#{SRC}/*/*.md").each do |chapter|
     content = "# #{book}\n\n[[#{book}-1|Start Reading →]]\n\n#{chapters}\n\nlinks: [[The Bible]]"
   end
 
-  `mkdir -p '#{DST}/#{folder}'`
+  `mkdir -p '#{BIBLE_DST}/#{folder}'`
 
-  File.write("#{DST}/#{folder}/#{filename}", content)
+  File.write("#{BIBLE_DST}/#{folder}/#{filename}", content)
 end
