@@ -19,6 +19,9 @@ Dir.glob("#{BIBLE_SRC}/*/*.md").each do |chapter|
   # fix the verses
   content.gsub!(/(###### \d+) /) { |v| "\n\n#{v}\n\n" }
 
+  # fix headers
+  content.gsub!(/([;.,\-])([A-Z].+)$/) { |_h| "#{Regexp.last_match(1)}\n\n##### #{Regexp.last_match(2)}" }
+
   # chapter
   if filename.match(/-\d+/)
     # add links back to the book
