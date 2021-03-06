@@ -1,5 +1,5 @@
-SRC = './ESV-original'
-DST = '/Users/evan/src/github.com/evantravers/undo-zk/wiki/ESV'
+SRC = './ESV'.freeze
+DST = './wiki/ESV'.freeze
 
 `rm -rf #{DST}`
 
@@ -34,6 +34,6 @@ Dir.glob("#{SRC}/*/*.md").each do |chapter|
   end
 
   `mkdir -p '#{DST}/#{book}'`
-  
+
   File.write("#{DST}/#{book}/#{filename}", content)
 end
