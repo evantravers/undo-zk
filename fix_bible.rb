@@ -34,7 +34,7 @@ Dir.glob("#{BIBLE_SRC}/*/*.md").each do |chapter|
       .glob("#{BIBLE_SRC}/#{book}/*.md")
       .filter { |c| c.match(/-\d+/) }
       .sort_by { |c| chapter_number(c).to_i }
-      .map { |c| "- [[#{File.basename(c)}|#{chapter_number(c)}]]" }
+      .map { |c| "- [[#{File.basename(c)}|Chapter #{chapter_number(c)}]]" }
       .join("\n")
     content = "# #{book}\n\n[[#{book}-1|Start Reading →]]\n\n#{chapters}\n\nlinks: [[The Bible]]"
   end
