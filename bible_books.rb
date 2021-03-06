@@ -66,7 +66,7 @@ BOOKS = {
   '2 John'          => /2 John|2 John|2 Jhn\.?|2 Jn\.?|2 J\.?|2John|2Jhn\.?|2Joh\.?|2Jn\.?|2Jo\.?|2J\.?|II John|II Jhn\.?|II Joh\.?|II Jn\.?|II Jo\.?|2nd John|Second John/,
   '3 John'          => /3 John|3 John|3 Jhn\.?|3 Jn\.?|3 J\.?|3John|3Jhn\.?|3Joh\.?|3Jn\.?|3Jo\.?|3J\.?|III John|III Jhn\.?|III Joh\.?|III Jn\.?|III Jo\.?|3rd John|Third John/,
   'Jude'            => /Jude|Jude|Jud\.?|Jd\.?/,
-  'Revelation'      => /Revelation|Most common:Rev|Re|The Revelation/
+  'Revelation'      => /Revelation|Rev|Re|The Revelation/
 }.freeze
 
 def book_number(book)
