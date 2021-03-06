@@ -1,3 +1,5 @@
+require './bible_books'
+
 SRC = './ESV'.freeze
 DST = './wiki/ESV'.freeze
 
@@ -8,10 +10,12 @@ def chapter_number(str)
 end
 
 Dir.glob("#{SRC}/*/*.md").each do |chapter|
-  book     = File.dirname(chapter).gsub("#{SRC}/", '')
-  filename = File.basename(chapter)
-  content  = File.read(chapter)
-  number   = chapter_number(chapter)
+  book       = File.dirname(chapter).gsub("#{SRC}/", '')
+  folder_num = book_number(book)
+  folder     = "#{folder_num} - #{book}"
+  filename   = File.basename(chapter)
+  content    = File.read(chapter)
+  number     = chapter_number(chapter)
 
   # fix the verses
   content.gsub!(/(###### \d+) /) { |v| "\n\n#{v}\n\n" }
@@ -19,7 +23,7 @@ Dir.glob("#{SRC}/*/*.md").each do |chapter|
   # chapter
   if filename.match(/-\d+/)
     # add links back to the book
-    content = "# [[ESV/#{book}/#{book}|#{book} #{number}]]\n#{content}"
+    content = "# [[ESV/#{folder}/#{book}|#{book} #{number}]]\n#{content}"
   # book title
   else
     # find all the chapters
@@ -33,7 +37,7 @@ Dir.glob("#{SRC}/*/*.md").each do |chapter|
     content = "# #{book}\n\n[[#{book}-1|Start Reading →]]\n\n#{chapters}\n\nlinks: [[The Bible]]"
   end
 
-  `mkdir -p '#{DST}/#{book}'`
+  `mkdir -p '#{DST}/#{folder}'`
 
-  File.write("#{DST}/#{book}/#{filename}", content)
+  File.write("#{DST}/#{folder}/#{filename}", content)
 end
