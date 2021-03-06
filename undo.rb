@@ -100,12 +100,12 @@ class Zettel
 
   def initialize(file)
     @original_filename = file
+    file_content = File.read(file)
 
-    file_content       = File.read(file)
-    @meta              = load_yaml(file_content)
-    @content           = remove_meta(file_content)
-
+    @meta = load_yaml(file_content)
     filter_meta
+
+    @content = remove_frontmatter(file_content)
   end
 
   def load_yaml(content)
@@ -123,7 +123,7 @@ class Zettel
     @meta.delete_if { |_k, v| v.is_a?(Array) && v.empty? }
   end
 
-  def remove_meta(str)
+  def remove_frontmatter(str)
     str.gsub(/---.+?---\n{0,2}/m, '')
   end
 
