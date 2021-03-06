@@ -20,7 +20,7 @@ Dir.glob("#{BIBLE_SRC}/*/*.md").each do |chapter|
   content.gsub!(/(###### \d+) /) { |v| "\n\n#{v}\n\n" }
 
   # fix headers
-  content.gsub!(/([.,;'"\-])([A-Z](?:[^"].)+)$/) { |_h| "#{Regexp.last_match(1)}\n\n##### #{Regexp.last_match(2)}" }
+  content.gsub!(/(\S[.,;'"\-])([A-Z](?:[^"].)+)$/m) { |_h| "#{Regexp.last_match(1)}\n\n##### #{Regexp.last_match(2)}" }
 
   # chapter
   if filename.match(/-\d+/)
